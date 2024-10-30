@@ -1,0 +1,23 @@
+send message
+// value, err := s.ChannelMessageSend(channelId, )
+		// sendDiscordMessage(s, channelId, os.Getenv("startupText"))
+		// log.Printf("Info: successfully send message to guild name: '%v', '%v'", r.Name, value.Content)
+// func sendDiscordMessage(s *discordgo.Session, channelID, message string) (string, error) {
+// 	value, err := s.ChannelMessageSend(channelID, message)
+// 	if err != nil {
+// 		return "", errors.New("error occured when sending discord message")
+// 	}
+
+// 	return value.Content, nil
+// }
+
+get message
+// s.AddHandler(func(s *discordgo.Session, r *discordgo.MessageCreate) {
+	// 	if r.Author.ID == s.State.User.ID {
+	// 		return
+	// 	}
+
+	// 	if strings.HasPrefix(r.Content, "!bmkg") {
+	// 		sendDiscordMessage(s, r.ChannelID, "hello world")
+	// 	}
+	// })
