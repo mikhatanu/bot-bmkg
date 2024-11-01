@@ -13,7 +13,7 @@ var admCodeMap = make(map[string]string)
 // Load from file
 func loadAdmFile() bool {
 	// Open and read file
-	myFile, err := os.Open("./util/adm.csv")
+	myFile, err := os.Open("./assets/adm.csv")
 	if err != nil {
 		log.Panicf("Error: Error when opening file: %v", err)
 	}
