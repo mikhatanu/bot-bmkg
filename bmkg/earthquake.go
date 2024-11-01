@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type Response struct {
+type ResponseEarthquake struct {
 	Infogempa Infogempa `json:"Infogempa"`
 }
 
@@ -30,7 +30,7 @@ type GempaTerbaru struct {
 	Shakemap            string `json:"Shakemap"`
 }
 
-func GetEarthquake(fileName string) (*Response, error) {
+func GetEarthquake(fileName string) (*ResponseEarthquake, error) {
 	bmkgFileName := map[string]bool{
 		"autogempa.json":      true,
 		"gempaterkini.json":   false,
@@ -56,7 +56,7 @@ func GetEarthquake(fileName string) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	returnData := Response{}
+	returnData := ResponseEarthquake{}
 	if err := json.Unmarshal(responseData, &returnData); err != nil {
 		return nil, err
 	}

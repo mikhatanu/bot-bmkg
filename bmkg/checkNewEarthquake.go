@@ -37,6 +37,7 @@ func NewEarthquakeHandler(x *InMemoryStore, s *discordgo.Session, c map[string]*
 		x.LatestEarthquake = convertToDate
 		log.Printf("Info: InMemoryStore updated to %+v", x)
 		send := sendDiscordMessageEmbed(curr, s, c)
+		// send := true
 		if !send {
 			return false
 		}
@@ -46,7 +47,7 @@ func NewEarthquakeHandler(x *InMemoryStore, s *discordgo.Session, c map[string]*
 	return true
 }
 
-func sendDiscordMessageEmbed(r *Response, s *discordgo.Session, c map[string]*ChannelIDMemoryStore) bool {
+func sendDiscordMessageEmbed(r *ResponseEarthquake, s *discordgo.Session, c map[string]*ChannelIDMemoryStore) bool {
 	imageUrl := "https://data.bmkg.go.id/DataMKG/TEWS" + r.Infogempa.Gempa.Shakemap
 
 	field := []*discordgo.MessageEmbedField{
@@ -91,9 +92,10 @@ func sendDiscordMessageEmbed(r *Response, s *discordgo.Session, c map[string]*Ch
 			Inline: true,
 		},
 	}
+	log.Println(c)
 
 	mes := discordgo.MessageEmbed{
-		URL:       "https://bmkg.go.id/",
+		URL:       "https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json",
 		Timestamp: r.Infogempa.Gempa.DateTime,
 		Image: &discordgo.MessageEmbedImage{
 			URL: imageUrl,
@@ -110,12 +112,13 @@ func sendDiscordMessageEmbed(r *Response, s *discordgo.Session, c map[string]*Ch
 		Fields: field,
 	}
 	for _, guild := range s.State.Guilds {
-		value, err := s.ChannelMessageSendEmbed(c[guild.ID].ChannelID, &mes)
+		_, err := s.ChannelMessageSendEmbed(c[guild.ID].ChannelID, &mes)
 		if err != nil {
 			log.Printf("Error: Failed to send embedded message, %v", err)
 			return false
 		}
-		log.Printf("Info: Message send with content: \n%+v", value.Embeds)
+		log.Printf("Info: Earthquake message send to guild '%v'", guild.Name)
+
 	}
 	return true
 }
