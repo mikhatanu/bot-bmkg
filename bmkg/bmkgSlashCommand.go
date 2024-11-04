@@ -18,6 +18,18 @@ var (
 		{
 			Name:        "get-earthquake",
 			Description: "Shows last 15 earthquake.",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "semua-gempa",
+					Description: "shows all last 15 earthquake regardless of magnitude",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+				},
+				{
+					Name:        "semua-gempa-potensi-tsunami",
+					Description: "shows all last 15 earthquake with M 5.0+",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+				},
+			},
 		},
 		{
 			Name:        "get-weather-forecast",
@@ -120,7 +132,70 @@ var (
 				},
 			})
 		},
-		// todo get last 15 earthquake
+		"get-earthquake": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			options := i.ApplicationCommandData().Options
 
+			// As you can see, names of subcommands (nested, top-level)
+			// and subcommand groups are provided through the arguments.
+			switch options[0].Name {
+			case "semua-gempa":
+				req := &ResponseEarthquakeLast15{}
+				req, err := getAllEarthquake("gempadirasakan.json")
+				if err != nil {
+					log.Printf("%v", err)
+					return
+				}
+				emb := CreateAllEarthquakeEmbed(req)
+				image, err := createStaticMaps(req)
+				if err != nil {
+					log.Printf("%v", err)
+					return
+				}
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Title:  "Earthquake Map",
+						Embeds: emb,
+						Files: []*discordgo.File{
+							{
+								ContentType: "image/png",
+								Name:        "gempadirasakan.png",
+								Reader:      image,
+							},
+						},
+					},
+				})
+				return
+			case "semua-gempa-potensi-tsunami":
+				req := &ResponseEarthquakeLast15{}
+				req, err := getAllEarthquake("gempaterkini.json")
+				if err != nil {
+					log.Printf("%v", err)
+					return
+				}
+				emb := CreateAllEarthquakeEmbed(req)
+				image, err := createStaticMaps(req)
+				if err != nil {
+					log.Printf("%v", err)
+					return
+				}
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Title:  "Earthquake Map",
+						Embeds: emb,
+						Files: []*discordgo.File{
+							{
+								ContentType: "image/png",
+								Name:        "gempadirasakan.png",
+								Reader:      image,
+							},
+						},
+					},
+				})
+				return
+			}
+
+		},
 	}
 )

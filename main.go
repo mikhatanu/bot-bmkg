@@ -15,7 +15,6 @@ import (
 func main() {
 
 	// Initialize some var
-	var eventChan = make(chan bool)
 	cStore := make(map[string]*bmkg.ChannelIDMemoryStore)
 	registeredCommands := make(map[string][]*discordgo.ApplicationCommand)
 	earthquake := &bmkg.InMemoryStore{
@@ -57,6 +56,8 @@ func main() {
 			ChannelName: channelMap["channelName"],
 			ChannelID:   channelMap["channelID"],
 		}
+		log.Printf("Info: added channel ID to guild: %v", cStore[r.ID])
+
 		log.Printf("Info: Adding commands to guild %v", r.Name)
 		for _, v := range bmkg.Commands {
 			go func() {
@@ -68,13 +69,18 @@ func main() {
 			}()
 
 		}
-		eventChan <- true
 	})
 	// On slash command interaction
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := bmkg.CommandHandlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
 		}
+	})
+
+	s.AddHandler(func(s *discordgo.Session, i *discordgo.GuildDelete) {
+		log.Printf("Info: Guild unavailable, or bot was removed from guild: %v. Deleting channel ID %v", i.ID, cStore[i.ID])
+
+		delete(cStore, i.ID)
 	})
 
 	// Create a websocket connection to discord
@@ -84,13 +90,10 @@ func main() {
 	}
 	defer s.Close()
 
-	// wait for at least 1 cstore data is loaded
-	<-eventChan
-
 	// Run a function that checks new earthquake every 7 second
 	go func() {
 		for {
-			if bmkg.NewEarthquakeHandler(earthquake, s, cStore) {
+			if cStore != nil && bmkg.NewEarthquakeHandler(earthquake, s, cStore) {
 				log.Println("Info: Message send to guild channel successfully")
 				log.Printf("Info: Current earthquake time is %v", earthquake.LatestEarthquake)
 			}

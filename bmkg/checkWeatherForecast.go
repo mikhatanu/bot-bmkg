@@ -117,8 +117,9 @@ func createWeatherEmbedResponse(req *ResponseWeather) []*discordgo.MessageEmbed 
 			timeWeather = tF
 		}
 		mes = append(mes, &discordgo.MessageEmbedField{
-			Name:  tFormat,
-			Value: value,
+			Name:   tFormat,
+			Value:  value,
+			Inline: true,
 		})
 	}
 

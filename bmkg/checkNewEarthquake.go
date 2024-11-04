@@ -19,7 +19,7 @@ type ChannelIDMemoryStore struct {
 
 func NewEarthquakeHandler(x *InMemoryStore, s *discordgo.Session, c map[string]*ChannelIDMemoryStore) bool {
 	// Get earthquake with file name autogempa.json which gets latest earthquake from bmkg
-	curr, err := GetEarthquake("autogempa.json")
+	curr, err := GetEarthquake()
 	if err != nil {
 		log.Printf("Error: %v", err)
 		return false
